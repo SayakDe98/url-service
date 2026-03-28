@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
-	"database/sql"
+	"fmt"
 	"log"
 	"net"
+	"os"
+	"urlshortener/db"
 	"urlshortener/migration"
 	pb "urlshortener/proto"
 	"urlshortener/server"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -17,16 +20,22 @@ import (
 
 func main() {
 	ctx := context.Background()
-
+	if os.Getenv("APP_ENV") != "production" {
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			fmt.Println("No .env file present")
+		}
+	}
 	// ---- MySQL ----
-	dsn := "root:@tcp(127.0.0.1:3306)/urlshortener?parseTime=true&loc=Asia%2FKolkata"
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		log.Fatal("DB connection error:", err)
-	}
-	if err = db.Ping(); err != nil {
-		log.Fatal("DB unreachable:", err)
-	}
+	// dsn := "user:password@tcp(host:3306)/db_name?parseTime=true&loc=Asia%2FKolkata"
+	// db, err := sql.Open("mysql", dsn)
+	// if err != nil {
+	// 	log.Fatal("DB connection error:", err)
+	// }
+	// if err = db.Ping(); err != nil {
+	// 	log.Fatal("DB unreachable:", err)
+	// }
+	db := db.InitDB()
 
 	// ---- Redis ----
 	rdb := redis.NewClient(&redis.Options{
