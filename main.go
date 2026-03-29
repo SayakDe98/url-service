@@ -38,9 +38,14 @@ func main() {
 	db := db.InitDB()
 
 	// ---- Redis ----
-	rdb := redis.NewClient(&redis.Options{
-		Addr: os.Getenv("REDIS_URL"),
-	})
+	// rdb := redis.NewClient(&redis.Options{
+	// 	Addr: os.Getenv("REDIS_URL"),
+	// })
+	opt, err := redis.ParseURL(os.Getenv("REDIS_URL"))
+	if err != nil {
+		log.Fatal("Invalid Redis URL:", err)
+	}
+	rdb := redis.NewClient(opt)
 	if err := rdb.Ping(ctx).Err(); err != nil {
 		log.Fatal("Redis unreachable:", err)
 	}
