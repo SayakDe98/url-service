@@ -120,7 +120,7 @@ jobs:
             EOF
 
             # Run Go container on the same network
-            docker run -d -p 8080:8080 \
+            docker run -d -p ${{ secrets.GRPC_PORT }}:${{ secrets.GRPC_PORT }} \
               --name url-shortener \
               --network url-shortener-net \
               --restart always \
